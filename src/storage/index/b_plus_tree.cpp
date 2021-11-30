@@ -242,9 +242,13 @@ template <typename N>
 bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
   if (node->IsRootPage()) {
     bool removeOldNode = AdjustRoot(node);
+    LOG_DEBUG("node's page id is %d", node->GetPageId());
+    LOG_DEBUG("node's page pin count is %d", reinterpret_cast<Page *>(node)->GetPinCount());
+
     if (removeOldNode) {
       transaction->AddIntoDeletedPageSet(node->GetPageId());
     }
+    return removeOldNode;
   }
   N* sibling;
   bool pre = FindSibling(node, sibling, transaction);
@@ -271,12 +275,13 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
   }
   if (!pre) {
     int removed_idx = parent->ValueIndex(sibling->GetPageId());
-    Coalesce((*node), (*sibling), parent, removed_idx, transaction);
+    Coalesce(&node, &sibling, &parent, removed_idx, transaction);
     buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), true);
     LOG_DEBUG("Unpin parent  page %d", parent_page->GetPageId());
     return false;
   }
   int removed_idx = parent->ValueIndex(node->GetPageId());
+  Coalesce(&sibling, &node, &parent, removed_idx, transaction);
   buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), true);
   LOG_DEBUG("Unpin parent  page %d", parent_page->GetPageId());
   return true;
@@ -335,8 +340,18 @@ bool BPLUSTREE_TYPE::Coalesce(N **neighbor_node, N **node,
     node_page->MoveAllTo(neighbor_page);
     neighbor_page->SetNextPageId(node_page->GetNextPageId());
   }
-  buffer_pool_manager_->UnpinPage((*neighbor_node)->GetPageId(), true);
-  transaction->AddIntoDeletedPageSet((*node));
+  LOG_DEBUG("before unpin, neighbour node page id is %d", (*neighbor_node)->GetPageId());
+  LOG_DEBUG("before unpin, neighbour node page' pin count is: %d", reinterpret_cast<Page *>((*neighbor_node))->GetPinCount());
+  // buffer_pool_manager_->UnpinPage((*neighbor_node)->GetPageId(), true);
+  LOG_DEBUG("after unpin, neighbour node page id is %d", (*neighbor_node)->GetPageId());
+  LOG_DEBUG("after unpin, neighbour node page' pin count is: %d", reinterpret_cast<Page *>((*neighbor_node))->GetPinCount());
+  LOG_DEBUG("before unpin, node page id is %d", (*neighbor_node)->GetPageId());
+  LOG_DEBUG("before unpin, node page' pin count is: %d", reinterpret_cast<Page *>((*neighbor_node))->GetPinCount());
+  // buffer_pool_manager_->UnpinPage((*node)->GetPageId(), true);
+  LOG_DEBUG("After unpin, node page id is %d", (*node)->GetPageId());
+  LOG_DEBUG("After unpin, node page' pin count is: %d", reinterpret_cast<Page *>((*node))->GetPinCount());
+  transaction->AddIntoDeletedPageSet((*node)->GetPageId());
+  LOG_DEBUG("node page id %d add into DeletedPageSet.", (*node)->GetPageId());
   (*parent)->Remove(index);
   LOG_DEBUG("Parent's size is: %d", (*parent)->GetSize());
   LOG_DEBUG("Parent's min size is: %d", (*parent)->GetMinSize());
@@ -395,6 +410,7 @@ void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index) {
   }
   buffer_pool_manager_->UnpinPage(neighbor_node->GetPageId(), true);
   buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), true);
+  buffer_pool_manager_->UnpinPage(node->GetPageId(), true);
 }
 
 /*
@@ -515,7 +531,7 @@ BPlusTreePage *BPLUSTREE_TYPE::CrabbingFetchPage(page_id_t child_page_id, page_i
   } else {
     page->WLatch();
   }
-  auto *node = reinterpret_cast<BPlusTreePage *>(page->GetData());
+  auto node = reinterpret_cast<BPlusTreePage *>(page->GetData());
 
   if (parent_id > 0 && (!exclusive || node->SafeOrNot(operation))) {
     BreakFree(exclusive, transaction, parent_id);
@@ -544,7 +560,7 @@ void BPLUSTREE_TYPE::BreakFree(bool exclusive, Transaction *transaction, page_id
       page->WUnlatch();
     }
     page_id_t page_id = page->GetPageId();
-    buffer_pool_manager_->UnpinPage(page_id, false);
+    buffer_pool_manager_->UnpinPage(page_id, exclusive);
     if (transaction->GetDeletedPageSet()->count(page_id) > 0) {
       buffer_pool_manager_->DeletePage(page_id);
       transaction->GetDeletedPageSet()->erase(page_id);

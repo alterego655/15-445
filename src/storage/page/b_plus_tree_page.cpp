@@ -61,11 +61,9 @@ bool BPlusTreePage::SafeOrNot(TypeOfOp opt) {
   if (opt == TypeOfOp::INSERT) {
     return IsLeafPage() ? GetSize() < GetMaxSize() - 1 : GetSize() < GetMaxSize();
   }
-  if (GetMinSize() == 1) {
-    return true;
+  if (opt == TypeOfOp::REMOVE) {
+    return GetSize() > GetMinSize();
   }
-  return GetSize() > GetMinSize();
-
   assert(false);
 }
 /*
