@@ -39,7 +39,7 @@ TEST(BPlusTreeTests, DeleteTest1) {
     index_key.SetFromInteger(key);
     tree.Insert(index_key, rid, transaction);
   }
-/*
+  /*
   std::vector<RID> rids;
   for (auto key : keys) {
     rids.clear();
@@ -54,7 +54,7 @@ TEST(BPlusTreeTests, DeleteTest1) {
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
-/*
+
   for (auto iterator = tree.Begin(index_key); iterator != tree.end(); ++iterator) {
     auto location = (*iterator).second;
     EXPECT_EQ(location.GetPageId(), 0);
@@ -63,8 +63,8 @@ TEST(BPlusTreeTests, DeleteTest1) {
   }
 
   EXPECT_EQ(current_key, keys.size() + 1);
-*/
-  std::vector<int64_t> remove_keys = {1, 5};
+
+  std::vector<int64_t> remove_keys = {1, 5, 3, 4};
   for (auto key : remove_keys) {
     index_key.SetFromInteger(key);
     tree.Remove(index_key, transaction);
@@ -82,7 +82,7 @@ TEST(BPlusTreeTests, DeleteTest1) {
     size = size + 1;
   }
 
-  EXPECT_EQ(size, 3);
+  EXPECT_EQ(size, 1);
 
   bpm->UnpinPage(HEADER_PAGE_ID, true);
   delete key_schema;
@@ -134,6 +134,7 @@ TEST(BPlusTreeTests, DeleteTest2) {
   int64_t start_key = 1;
   int64_t current_key = start_key;
   index_key.SetFromInteger(start_key);
+
   for (auto iterator = tree.Begin(index_key); iterator != tree.end(); ++iterator) {
     auto location = (*iterator).second;
     EXPECT_EQ(location.GetPageId(), 0);
@@ -171,5 +172,5 @@ TEST(BPlusTreeTests, DeleteTest2) {
   remove("test.db");
   remove("test.log");
 }
- */
+*/
 }  // namespace bustub

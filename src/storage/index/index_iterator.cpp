@@ -16,7 +16,11 @@ INDEXITERATOR_TYPE::IndexIterator(B_PLUS_TREE_LEAF_PAGE_TYPE *leafPage, int idx,
     : leaf_page(leafPage), cur_idx(idx), bufferPoolManager_(bufferPoolManager) {}
 
 INDEX_TEMPLATE_ARGUMENTS
-INDEXITERATOR_TYPE::~IndexIterator() = default;
+INDEXITERATOR_TYPE::~IndexIterator() {
+  if (leaf_page != nullptr) {
+    UnlockAndUnPin();
+  }
+}
 
 INDEX_TEMPLATE_ARGUMENTS
 bool INDEXITERATOR_TYPE::isEnd() {
@@ -33,9 +37,10 @@ INDEXITERATOR_TYPE &INDEXITERATOR_TYPE::operator++() {
   cur_idx++;
   if (cur_idx == leaf_page->GetSize() && leaf_page->GetNextPageId() != INVALID_PAGE_ID) {
     page_id_t next_page_id = leaf_page->GetNextPageId();
+    UnlockAndUnPin();
     Page *next_page = bufferPoolManager_->FetchPage(next_page_id);  // pined page
+    next_page->RLatch();
     leaf_page = reinterpret_cast<B_PLUS_TREE_LEAF_PAGE_TYPE *>(next_page);
-    bufferPoolManager_->UnpinPage(next_page->GetPageId(), false);
     cur_idx = 0;
   }
   return *this;

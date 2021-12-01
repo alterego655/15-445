@@ -62,6 +62,9 @@ bool BPlusTreePage::SafeOrNot(TypeOfOp opt) {
     return IsLeafPage() ? GetSize() < GetMaxSize() - 1 : GetSize() < GetMaxSize();
   }
   if (opt == TypeOfOp::REMOVE) {
+    if (GetSize() == 1) {
+      return true;
+    }
     return GetSize() > GetMinSize();
   }
   assert(false);

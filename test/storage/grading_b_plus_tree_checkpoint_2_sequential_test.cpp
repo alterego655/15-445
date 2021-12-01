@@ -413,7 +413,7 @@ TEST(BPlusTreeTests, ScaleTest) {
  * At the same time, concurrently get the previously inserted keys.
  * Check all the keys get are the same set of keys as previously
  * inserted.
-
+*/
 TEST(BPlusTreeTests, SequentialMixTest) {
   // create KeyComparator and index schema
   Schema *key_schema = ParseCreateStatement("a bigint");
@@ -486,5 +486,5 @@ TEST(BPlusTreeTests, SequentialMixTest) {
   remove("test.db");
   remove("test.log");
 }
-*/
+
 }  // namespace bustub

@@ -112,13 +112,50 @@ class BPlusTree {
   bool AdjustRoot(BPlusTreePage *node);
 
   void UpdateRootPageId(int insert_record = 0);
+  inline void Lock(bool exclusive,Page * page) {
+    if (exclusive) {
+      page->WLatch();
+    } else {
+      page->RLatch();
+    }
+  }
 
+  inline void Unlock(bool exclusive,Page *page) {
+    if (exclusive) {
+      page->WUnlatch();
+    } else {
+      page->RUnlatch();
+    }
+  }
+  inline void Unlock(bool exclusive,page_id_t pageId) {
+    auto page = buffer_pool_manager_->FetchPage(pageId);
+    Unlock(exclusive,page);
+    buffer_pool_manager_->UnpinPage(pageId,exclusive);
+  }
+
+  inline void LockRootPageId(bool exclusive) {
+    if (exclusive) {
+      mutex_.WLock();
+    } else {
+      mutex_.RLock();
+    }
+  }
+
+  inline void TryUnlockRootPageId(bool exclusive) {
+    if (exclusive) {
+      mutex_.WUnlock();
+    } else {
+      mutex_.RUnlock();
+    }
+  }
   /* Debug Routines for FREE!! */
   void ToGraph(BPlusTreePage *page, BufferPoolManager *bpm, std::ofstream &out) const;
 
   void ToString(BPlusTreePage *page, BufferPoolManager *bpm) const;
 
   // member variable
+  ReaderWriterLatch mutex_;
+
   std::string index_name_;
   page_id_t root_page_id_;
   BufferPoolManager *buffer_pool_manager_;
