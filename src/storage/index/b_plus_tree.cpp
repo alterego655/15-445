@@ -92,12 +92,9 @@ void BPLUSTREE_TYPE::StartNewTree(const KeyType &key, const ValueType &value) {
   LeafPage *root = reinterpret_cast<LeafPage *>(page->GetData());
   root->Init(new_root_id, INVALID_PAGE_ID, leaf_max_size_);
   root_page_id_ = new_root_id;
-  LOG_DEBUG("root page id after starting new tree: %d", root_page_id_);
   UpdateRootPageId(1);
   root->Insert(key, value, comparator_);
-  LOG_DEBUG("Size after StartNewTree insertion: %d", root->GetSize());
   buffer_pool_manager_->UnpinPage(new_root_id, true);
-  LOG_DEBUG("Unpin page id: %d", root->GetPageId());
 }
 
 /*
@@ -120,14 +117,7 @@ bool BPLUSTREE_TYPE::InsertIntoLeaf(const KeyType &key, const ValueType &value, 
   leaf_page->Insert(key, value, comparator_);
   if (leaf_page->GetSize() >= leaf_page->GetMaxSize()) {
     LeafPage *new_leaf = Split(leaf_page, transaction);
-    LOG_DEBUG("Page splits, original page_id: %d, new page_id: %d", leaf_page->GetPageId(), new_leaf->GetPageId());
-    LOG_DEBUG("Original page's pin count is %d", page->GetPinCount());
-    LOG_DEBUG("New page's pin count is %d", reinterpret_cast<Page *>(new_leaf)->GetPinCount());
-    LOG_DEBUG("original page size: %d, new created one's : %d", leaf_page->GetSize(), new_leaf->GetSize());
-
     InsertIntoParent(leaf_page, new_leaf->KeyAt(0), new_leaf, transaction);
-    LOG_DEBUG("After inserting into parent, original page's pin count is %d", page->GetPinCount());
-    LOG_DEBUG("After inserting into parent, new page's pin count is %d", reinterpret_cast<Page *>(new_leaf)->GetPinCount());
   }
   BreakFree(true, transaction);
   return true;
@@ -149,9 +139,7 @@ N *BPLUSTREE_TYPE::Split(N *node, Transaction *transaction) {
     throw Exception(ExceptionType::OUT_OF_MEMORY, "Warning!");
   }
   new_page->WLatch();
-  LOG_DEBUG("Newly created page id during splitting: %d", new_page->GetPageId());
   transaction->AddIntoPageSet(new_page);
-  LOG_DEBUG("Newly created page's pin count during splitting: %d", new_page->GetPinCount());
   N *new_node;
   if (node->IsLeafPage()) {
     auto *leaf_node = reinterpret_cast<LeafPage *>(node);
@@ -194,15 +182,7 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node, const KeyType &ke
     new_root_page->PopulateNewRoot(old_node->GetPageId(), key, new_node->GetPageId());
     old_node->SetParentPageId(new_root_id);
     new_node->SetParentPageId(new_root_id);
-    LOG_DEBUG("Old node page id is %d", old_node->GetPageId());
-    LOG_DEBUG("Old node's pin count: %d", reinterpret_cast<Page *>(old_node)->GetPinCount());
-    LOG_DEBUG("New node page id is %d", new_node->GetPageId());
-    LOG_DEBUG("New node's pin count: %d", reinterpret_cast<Page *>(new_node)->GetPinCount());
     buffer_pool_manager_->UnpinPage(new_root_page->GetPageId(), true);
-    LOG_DEBUG("Unpin new root page id: %d", new_root_page->GetPageId());
-    LOG_DEBUG("New root page's pin count: %d", page->GetPinCount());
-    LOG_DEBUG("insert to parent, original node page id: %d; new created one's: %d", old_node->GetPageId(), new_node->GetPageId());
-    LOG_DEBUG("new created node's size: %d", new_root_page->GetSize());
     return;
   }
   page_id_t parent_page_id = old_node->GetParentPageId();
@@ -212,14 +192,9 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node, const KeyType &ke
   parent_page->InsertNodeAfter(old_node->GetPageId(), key, new_node->GetPageId());
   if (parent_page->GetSize() > parent_page->GetMaxSize()) {
     auto *new_parent_page = Split(parent_page, transaction);
-    LOG_DEBUG("New parent page's pin count before inserting into parent: %d", reinterpret_cast<Page *>(new_parent_page)->GetPinCount());
     InsertIntoParent(parent_page, new_parent_page->KeyAt(0), new_parent_page, transaction);
-    LOG_DEBUG("New parent page's pin count after inserting into parent: %d", reinterpret_cast<Page *>(new_parent_page)->GetPinCount());
   }
   buffer_pool_manager_->UnpinPage(parent_page_id, true);
-  LOG_DEBUG("New root page's pin count: %d", page->GetPinCount());
-  LOG_DEBUG("Unpin parent page id: %d", parent_page->GetPageId());
-  LOG_DEBUG("Insertion to parent completes, parent page id: %d", parent_page_id);
 }
 
 /*****************************************************************************
@@ -240,8 +215,6 @@ void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
   auto* leaf_page = FindLeafPage(key, false, TypeOfOp::REMOVE, transaction);
   LeafPage* ptr_to_leaf = reinterpret_cast<LeafPage *>(leaf_page);
   ptr_to_leaf->RemoveAndDeleteRecord(key, comparator_);
-  LOG_DEBUG("Deletion at leaf completes: %d", leaf_page->GetPageId());
-  LOG_DEBUG("The size after deletion: %d.\n The min size is %d.", ptr_to_leaf->GetSize(), ptr_to_leaf->GetMinSize());
   if (ptr_to_leaf->GetSize() < ptr_to_leaf->GetMinSize()) {
     CoalesceOrRedistribute(ptr_to_leaf, transaction);
   }
@@ -260,9 +233,6 @@ template <typename N>
 bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
   if (node->IsRootPage()) {
     bool removeOldNode = AdjustRoot(node);
-    LOG_DEBUG("node's page id is %d", node->GetPageId());
-    LOG_DEBUG("node's page pin count is %d", reinterpret_cast<Page *>(node)->GetPinCount());
-    LOG_DEBUG("Transaction id : %d", transaction->GetTransactionId());
     if (removeOldNode) {
       transaction->AddIntoDeletedPageSet(node->GetPageId());
     }
@@ -270,38 +240,27 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
   }
   N* sibling;
   bool pre = FindSibling(node, sibling, transaction);
-  int before = pre ? 0 : 1;
-  if (before == 0) {
-    LOG_DEBUG("Sibling is in front of node.");
-  } else {
-    LOG_DEBUG("Sibling is NOT in front of node,");
-  }
 
   Page* parent_page = buffer_pool_manager_->FetchPage(node->GetParentPageId());
-  LOG_DEBUG("Fetch parent node page id: %d", node->GetParentPageId());
 
   InternalPage* parent = reinterpret_cast<InternalPage *>(parent_page);
 
   // N* sibling = reinterpret_cast<N *>(sibling_page);
   if (sibling->GetSize() + node->GetSize() > node->GetMaxSize()) {
     int node_idx_parent = parent->ValueIndex(node->GetPageId());
-    LOG_DEBUG("node's index in parent is: %d", node_idx_parent);
     Redistribute(sibling, node, node_idx_parent);
     buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), false);
-    LOG_DEBUG("Unpin parent page %d", parent_page->GetPageId());
     return false;
   }
   if (!pre) {
     int removed_idx = parent->ValueIndex(sibling->GetPageId());
     Coalesce(&node, &sibling, &parent, removed_idx, transaction);
     buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), true);
-    LOG_DEBUG("Unpin parent  page %d", parent_page->GetPageId());
     return false;
   }
   int removed_idx = parent->ValueIndex(node->GetPageId());
   Coalesce(&sibling, &node, &parent, removed_idx, transaction);
   buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), true);
-  LOG_DEBUG("Unpin parent  page %d", parent_page->GetPageId());
   return true;
 }
 
@@ -311,7 +270,6 @@ template <typename N>
 bool BPLUSTREE_TYPE::FindSibling(N *node, N* &sibling, Transaction *transaction) {
 
   Page* parent_page = buffer_pool_manager_->FetchPage(node->GetParentPageId());
-  LOG_DEBUG("Fetching node's parent page %d", node->GetParentPageId());
   assert(parent_page != nullptr);
   InternalPage *parent = reinterpret_cast<InternalPage *>(parent_page);
 
@@ -322,9 +280,7 @@ bool BPLUSTREE_TYPE::FindSibling(N *node, N* &sibling, Transaction *transaction)
   page_id_t sibling_id = parent->ValueAt(sibling_idx);
   BPlusTreePage *sibling_page = CrabbingFetchPage(sibling_id, parent_page->GetPageId(), transaction, TypeOfOp::REMOVE);
   sibling = reinterpret_cast<N*>(sibling_page);
-  LOG_DEBUG("The page id of sibling is %d", sibling_id);
   buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), false);
-  LOG_DEBUG("Unpin parent page %d", parent_page->GetPageId());
   return sibling_idx == node_idx - 1;
 }
 
@@ -358,21 +314,8 @@ bool BPLUSTREE_TYPE::Coalesce(N **neighbor_node, N **node,
     node_page->MoveAllTo(neighbor_page);
     neighbor_page->SetNextPageId(node_page->GetNextPageId());
   }
-  LOG_DEBUG("before unpin, neighbour node page id is %d", (*neighbor_node)->GetPageId());
-  LOG_DEBUG("before unpin, neighbour node page' pin count is: %d", reinterpret_cast<Page *>((*neighbor_node))->GetPinCount());
-  // buffer_pool_manager_->UnpinPage((*neighbor_node)->GetPageId(), true);
-  LOG_DEBUG("after unpin, neighbour node page id is %d", (*neighbor_node)->GetPageId());
-  LOG_DEBUG("after unpin, neighbour node page' pin count is: %d", reinterpret_cast<Page *>((*neighbor_node))->GetPinCount());
-  LOG_DEBUG("before unpin, node page id is %d", (*neighbor_node)->GetPageId());
-  LOG_DEBUG("before unpin, node page' pin count is: %d", reinterpret_cast<Page *>((*neighbor_node))->GetPinCount());
-  // buffer_pool_manager_->UnpinPage((*node)->GetPageId(), true);
-  LOG_DEBUG("After unpin, node page id is %d", (*node)->GetPageId());
-  LOG_DEBUG("After unpin, node page' pin count is: %d", reinterpret_cast<Page *>((*node))->GetPinCount());
   transaction->AddIntoDeletedPageSet((*node)->GetPageId());
-  LOG_DEBUG("node page id %d add into DeletedPageSet.", (*node)->GetPageId());
   (*parent)->Remove(index);
-  LOG_DEBUG("Parent's size is: %d", (*parent)->GetSize());
-  LOG_DEBUG("Parent's min size is: %d", (*parent)->GetMinSize());
   if ((*parent)->GetSize() < (*parent)->GetMinSize()) {
     return CoalesceOrRedistribute(*parent, transaction);
   }
@@ -392,7 +335,6 @@ INDEX_TEMPLATE_ARGUMENTS
 template <typename N>
 void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index) {
   auto* page_of_parent = buffer_pool_manager_->FetchPage(node->GetParentPageId());
-  LOG_DEBUG("Fetching node's parent page %d", node->GetParentPageId());
   auto* parent_page = reinterpret_cast<InternalPage *>(page_of_parent);
 
   if (!node->IsLeafPage()) {
@@ -448,7 +390,6 @@ bool BPLUSTREE_TYPE::AdjustRoot(BPlusTreePage *old_root_node) {
     root_page_id_ = new_root_id;
     UpdateRootPageId(0);
     Page* new_root_page = buffer_pool_manager_->FetchPage(new_root_id);
-    LOG_DEBUG("Fetching ajusted root page %d", new_root_page->GetPageId());
     BPlusTreePage *new_root_node = reinterpret_cast<BPlusTreePage *>(new_root_page);
     new_root_node->SetParentPageId(INVALID_PAGE_ID);
     buffer_pool_manager_->UnpinPage(new_root_page->GetPageId(), true);
@@ -457,7 +398,6 @@ bool BPLUSTREE_TYPE::AdjustRoot(BPlusTreePage *old_root_node) {
   if (old_root_node->GetSize() == 0) {
     root_page_id_ = INVALID_PAGE_ID;
     UpdateRootPageId(0);
-    LOG_DEBUG("The deleted page's id is: %d.", root_page_id_);
     return true;
   }
   return false;
@@ -536,7 +476,6 @@ Page *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key, bool leftMost, TypeOfOp o
     return nullptr;
   }
 
-  LOG_DEBUG("page_id: %d", root_page_id_);
   auto *node = CrabbingFetchPage(root_page_id_, -1, transaction, operation);
   page_id_t child_page_id;
 
@@ -559,10 +498,6 @@ BPlusTreePage *BPLUSTREE_TYPE::CrabbingFetchPage(page_id_t child_page_id, page_i
   }
   if (transaction != nullptr) {
     transaction->AddIntoPageSet(page);
-    LOG_DEBUG("Page %d adds into transaction %d's PageSet", page->GetPageId(),
-              transaction->GetTransactionId());
-    LOG_DEBUG("Transaction id %d's PageSet'size is %d", transaction->GetTransactionId(),
-              static_cast<int>(transaction->GetPageSet()->size()));
   }
   return node;
 }
@@ -581,22 +516,12 @@ void BPLUSTREE_TYPE::BreakFree(bool exclusive, Transaction *transaction, page_id
     Unlock(exclusive, page);
     page_id_t page_id = page->GetPageId();
     buffer_pool_manager_->UnpinPage(page_id, exclusive);
-    int exclusiveOrNot = static_cast<int>(exclusive);
-    LOG_DEBUG("Unpin page id %d of transaction id %d, exclusive or not %d(0 for yes)", page_id,
-              transaction->GetTransactionId(), exclusiveOrNot);
-    LOG_DEBUG("Page %d's pin count: %d", page_id, page->GetPinCount());
     if (transaction->GetDeletedPageSet()->count(page_id) > 0) {
       buffer_pool_manager_->DeletePage(page_id);
-      LOG_DEBUG("Deleted page id %d of transaction id %d", page_id, transaction->GetTransactionId());
       transaction->GetDeletedPageSet()->erase(page_id);
-      LOG_DEBUG("Erase page id %d of transaction id %d", page_id, transaction->GetTransactionId());
-      LOG_DEBUG("Transaction id %d's deleted page set's size is %d",
-                transaction->GetTransactionId(), static_cast<int>(transaction->GetDeletedPageSet()->size()));
     }
   }
   transaction->GetPageSet()->clear();
-  LOG_DEBUG("Transaction id %d's page set's size is %d",
-            transaction->GetTransactionId(), static_cast<int>(transaction->GetPageSet()->size()));
 }
 
 /*

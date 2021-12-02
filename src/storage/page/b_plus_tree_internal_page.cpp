@@ -47,14 +47,12 @@ KeyType B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyAt(int index) const {
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) {
   // assert(0 <= index && index < GetSize());
-  LOG_DEBUG("Set internal key at idx: %d", index);
   array[index].first = key;
 }
 
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) {
   // assert(0 <= index && index < GetSize());
-  LOG_DEBUG("Set internal value at idx: %d", index);
   array[index].second = value;
 }
 
@@ -119,7 +117,6 @@ ValueType B_PLUS_TREE_INTERNAL_PAGE_TYPE::Lookup(const KeyType &key, const KeyCo
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::PopulateNewRoot(const ValueType &old_value, const KeyType &new_key,
                                                      const ValueType &new_value) {
-  LOG_DEBUG("Page size: %d", GetSize());
   SetValueAt(0, old_value);
   SetKeyAt(1, new_key);
   SetValueAt(1, new_value);

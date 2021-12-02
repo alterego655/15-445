@@ -103,7 +103,6 @@ bool BufferPoolManager::UnpinPageImpl(page_id_t page_id, bool is_dirty) {
   }
   Page *p = GetTargetPage(frame_id);
   if (p->GetPinCount() < 0) {
-    LOG_DEBUG("The page id of page is %d", p->GetPageId());
     assert(false);
     return false;
   }
@@ -120,7 +119,6 @@ bool BufferPoolManager::UnpinPageImpl(page_id_t page_id, bool is_dirty) {
 bool BufferPoolManager::FlushPageImpl(page_id_t page_id) {
   // Make sure you call DiskManager::WritePage!
   std::lock_guard<std::mutex> guard(latch_);
-  LOG_DEBUG("Flushing page %d", page_id);
   assert(page_id != INVALID_PAGE_ID);
   frame_id_t frame_id = seekFrame(page_id);
   if (frame_id != INVALID_FRAME_ID) {
@@ -140,8 +138,6 @@ Page *BufferPoolManager::NewPageImpl(page_id_t *page_id) {
   // 4.   Set the page ID output parameter. Return a pointer to P.
 
   std::lock_guard<std::mutex> guard(latch_);
-  LOG_DEBUG("New page %d", *page_id);
-  LOG_DEBUG("Page: %p", page_id);
   frame_id_t frame_id = GetReplaceblePage();
   if (frame_id != INVALID_FRAME_ID) {
     Page *p = GetTargetPage(frame_id);
@@ -165,7 +161,6 @@ bool BufferPoolManager::DeletePageImpl(page_id_t page_id) {
   // 2.   If P exists, but has a non-zero pin-count, return false. Someone is using the page.
   // 3.   Otherwise, P can be deleted. Remove P from the page table, reset its metadata and return it to the free list.
   std::lock_guard<std::mutex> guard(latch_);
-  LOG_DEBUG("Deleting page %d", page_id);
   assert(page_id != INVALID_PAGE_ID);
   frame_id_t frame_id = seekFrame(page_id);
   if (frame_id == INVALID_FRAME_ID) {
@@ -174,7 +169,6 @@ bool BufferPoolManager::DeletePageImpl(page_id_t page_id) {
   }
   Page *p = GetTargetPage(frame_id);
   if (p->GetPinCount() > 0) {
-    LOG_DEBUG("The page id of page is %d", p->GetPageId());
     assert(false);
     return false;
   }

@@ -135,7 +135,6 @@ int B_PLUS_TREE_LEAF_PAGE_TYPE::Insert(const KeyType &key, const ValueType &valu
   int idx = KeyIndex(key, comparator);
   assert(idx >= 0);
   IncreaseSize(1);
-  LOG_DEBUG("insert idx: %d", idx);
 
   for (int i = GetSize() - 1; i > idx; i--) {
     array[i] = array[i - 1];
@@ -183,7 +182,6 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::CopyNFrom(MappingType *items, int size) {
 INDEX_TEMPLATE_ARGUMENTS
 bool B_PLUS_TREE_LEAF_PAGE_TYPE::Lookup(const KeyType &key, ValueType *value, const KeyComparator &comparator) const {
   int idx = KeyIndex(key, comparator);
-  LOG_DEBUG("Look up index: %d", idx);
 
   if (idx < GetSize() && comparator(KeyAt(idx), key) == 0) {
     *value = ValueAt(idx);
@@ -271,7 +269,6 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::CopyFirstFrom(const MappingType &item) {
   }
   array[0] = item;
   IncreaseSize(1);
-  LOG_DEBUG("size: %d", GetSize());
 }
 
 template class BPlusTreeLeafPage<GenericKey<4>, RID, GenericComparator<4>>;
