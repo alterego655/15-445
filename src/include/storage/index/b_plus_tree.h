@@ -139,13 +139,17 @@ class BPlusTree {
     } else {
       mutex_.RLock();
     }
+    rootLockCount++;
   }
 
   inline void TryUnlockRootPageId(bool exclusive) {
-    if (exclusive) {
-      mutex_.WUnlock();
-    } else {
-      mutex_.RUnlock();
+    if (rootLockCount > 0) {
+      if (exclusive) {
+        mutex_.WUnlock();
+      } else {
+        mutex_.RUnlock();
+      }
+      rootLockCount--;
     }
   }
   /* Debug Routines for FREE!! */
@@ -155,7 +159,7 @@ class BPlusTree {
 
   // member variable
   ReaderWriterLatch mutex_;
-
+  static thread_local int rootLockCount;
   std::string index_name_;
   page_id_t root_page_id_;
   BufferPoolManager *buffer_pool_manager_;

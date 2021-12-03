@@ -134,13 +134,11 @@ int B_PLUS_TREE_LEAF_PAGE_TYPE::Insert(const KeyType &key, const ValueType &valu
   }
   int idx = KeyIndex(key, comparator);
   assert(idx >= 0);
-  IncreaseSize(1);
-
-  for (int i = GetSize() - 1; i > idx; i--) {
+  for (int i = GetSize(); i > idx; i--) {
     array[i] = array[i - 1];
   }
-
   array[idx] = MappingType{key, value};
+  IncreaseSize(1);
   return GetSize();
 }
 
@@ -263,7 +261,7 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::MoveLastToFrontOf(BPlusTreeLeafPage *recipient)
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::CopyFirstFrom(const MappingType &item) {
   // assert(GetSize() <= GetMaxSize());
-  LOG_INFO("size :%d: ", GetSize());
+  // LOG_INFO("size :%d: ", GetSize());
   for (int i = GetSize(); i > 0; i--) {
     array[i] = array[i - 1];
   }

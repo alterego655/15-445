@@ -134,12 +134,12 @@ int B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertNodeAfter(const ValueType &old_value, 
 
   int idx = ValueIndex(old_value) + 1;
   assert(idx > 0);
-  IncreaseSize(1);
-  for (int i = GetSize() - 1; i > idx; --i) {
+  for (int i = GetSize(); i > idx; --i) {
     array[i] = array[i - 1];
   }
   SetKeyAt(idx, new_key);
   SetValueAt(idx, new_value);
+  IncreaseSize(1);
   return GetSize();
 }
 

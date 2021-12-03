@@ -373,7 +373,7 @@ TEST(BPlusTreeTests, ScaleTest) {
   EXPECT_EQ(current_key, keys.size() + 1);
 
 
-  int64_t remove_scale = 8888;
+  int64_t remove_scale = 9900;
   std::vector<int64_t> remove_keys;
   for (int64_t key = 1; key < remove_scale; key++) {
     remove_keys.push_back(key);
@@ -384,7 +384,7 @@ TEST(BPlusTreeTests, ScaleTest) {
     tree.Remove(index_key, transaction);
   }
 
-  start_key = 8888;
+  start_key = 9900;
   current_key = start_key;
   int64_t size = 0;
   index_key.SetFromInteger(start_key);
@@ -394,7 +394,7 @@ TEST(BPlusTreeTests, ScaleTest) {
     size = size + 1;
   }
 
-  EXPECT_EQ(size, 1112);
+  EXPECT_EQ(size, 100);
 
   bpm->UnpinPage(HEADER_PAGE_ID, true);
   delete key_schema;
