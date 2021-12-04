@@ -152,7 +152,7 @@ INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_LEAF_PAGE_TYPE::MoveHalfTo(BPlusTreeLeafPage *recipient) {
   assert(recipient != nullptr);
   int size = GetSize();
-  assert(size == GetMaxSize());
+  // assert(size == GetMaxSize());
   int move_size = size - size / 2;
   int start = size - move_size;
   recipient->CopyNFrom(array + start, move_size);

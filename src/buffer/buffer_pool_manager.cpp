@@ -102,14 +102,12 @@ bool BufferPoolManager::UnpinPageImpl(page_id_t page_id, bool is_dirty) {
     return true;
   }
   Page *p = GetTargetPage(frame_id);
-  if (p->GetPinCount() < 0) {
+  if (p->GetPinCount() <= 0) {
+    LOG_DEBUG("Error, the page %d should not be unpinned!", p->GetPageId());
     assert(false);
     return false;
   }
-  if (p->GetPinCount() > 0) {
-    p->DecrePinCount();
-  }
-  if (p->GetPinCount() == 0) {
+  if (--p->pin_count_ == 0) {
     replacer_->Unpin(frame_id);
   }
   p->is_dirty_ |= is_dirty;
@@ -169,7 +167,6 @@ bool BufferPoolManager::DeletePageImpl(page_id_t page_id) {
   }
   Page *p = GetTargetPage(frame_id);
   if (p->GetPinCount() > 0) {
-    assert(false);
     return false;
   }
   if (p->is_dirty_) {

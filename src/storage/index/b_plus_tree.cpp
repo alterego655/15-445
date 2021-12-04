@@ -78,7 +78,8 @@ bool BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
     return true;
   }
   TryUnlockRootPageId(true);
-  return InsertIntoLeaf(key, value, transaction);
+  bool res = InsertIntoLeaf(key, value, transaction);
+  return res;
 }
 /*
  * Insert constant key & value pair into an empty tree
@@ -211,9 +212,12 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node, const KeyType &ke
  */
 INDEX_TEMPLATE_ARGUMENTS
 void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
+  LockRootPageId(true);
   if (IsEmpty()) {
+    TryUnlockRootPageId(true);
     return;
   }
+  TryUnlockRootPageId(true);
   auto* leaf_page = FindLeafPage(key, false, TypeOfOp::REMOVE, transaction);
   LeafPage* ptr_to_leaf = reinterpret_cast<LeafPage *>(leaf_page);
   ptr_to_leaf->RemoveAndDeleteRecord(key, comparator_);
@@ -276,7 +280,6 @@ bool BPLUSTREE_TYPE::FindSibling(N *node, N* &sibling, Transaction *transaction)
   InternalPage *parent = reinterpret_cast<InternalPage *>(parent_page);
 
   int node_idx = parent->ValueIndex(node->GetPageId());
-  assert(node_idx >= 0);
   int sibling_idx = node_idx != 0 ? node_idx - 1 : node_idx + 1;
 
   page_id_t sibling_id = parent->ValueAt(sibling_idx);
@@ -351,7 +354,7 @@ void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index) {
       int idx = parent_page->ValueIndex(node_page->GetPageId());
       KeyType middle_key = parent_page->KeyAt(index);
       neighbor_page->MoveLastToFrontOf(node_page, middle_key, buffer_pool_manager_);
-      KeyType new_key = node->KeyAt(0);
+      KeyType new_key = node_page->KeyAt(0);
       parent_page->SetKeyAt(idx, new_key);
     }
   } else {
@@ -491,7 +494,7 @@ Page *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key, bool leftMost, TypeOfOp o
 INDEX_TEMPLATE_ARGUMENTS
 BPlusTreePage *BPLUSTREE_TYPE::CrabbingFetchPage(page_id_t child_page_id, page_id_t parent_id, Transaction *transaction, TypeOfOp operation) {
   bool exclusive = operation != TypeOfOp::READ;
-  auto *page = buffer_pool_manager_->FetchPage(child_page_id);
+  auto page = buffer_pool_manager_->FetchPage(child_page_id);
   Lock(exclusive, page);
   auto node = reinterpret_cast<BPlusTreePage *>(page->GetData());
 
