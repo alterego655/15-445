@@ -320,7 +320,7 @@ bool BPLUSTREE_TYPE::Coalesce(N **neighbor_node, N **node,
     transaction->AddIntoDeletedPageSet((*node)->GetPageId());
   }
   (*parent)->Remove(index);
-  if ((*parent)->GetSize() < (*parent)->GetMinSize()) {
+  if ((*parent)->GetSize() <= (*parent)->GetMinSize()) {
     return CoalesceOrRedistribute(*parent, transaction);
   }
   return false;
