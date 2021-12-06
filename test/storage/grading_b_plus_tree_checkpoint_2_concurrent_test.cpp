@@ -342,7 +342,7 @@ void MixTest1Call() {
     std::vector<int64_t> for_insert;
     std::vector<int64_t> for_delete;
     size_t sieve = 2;  // divide evenly
-    size_t total_keys = 254;
+    size_t total_keys = 1000;
     for (size_t i = 1; i <= total_keys; i++) {
       if (i % sieve == 0) {
         for_insert.push_back(i);
@@ -403,7 +403,7 @@ void MixTest2Call() {
     // Add perserved_keys
     std::vector<int64_t> perserved_keys;
     std::vector<int64_t> dynamic_keys;
-    size_t total_keys = 2960;
+    size_t total_keys = 3000;
     size_t sieve = 5;
     for (size_t i = 1; i <= total_keys; i++) {
       if (i % sieve == 0) {
@@ -571,7 +571,7 @@ TEST(BPlusTreeConcurrentTest, DeleteTest2) {
  * Then concurrently delete those already inserted keys and
  * insert different set of keys. Check if all old keys are
  * deleted and new keys are added correctly.
-
+*/
 TEST(BPlusTreeConcurrentTest, MixTest1) {
   TEST_TIMEOUT_BEGIN
   MixTest1Call();
@@ -579,7 +579,7 @@ TEST(BPlusTreeConcurrentTest, MixTest1) {
   remove("test.log");
   TEST_TIMEOUT_FAIL_END(1000 * 600)
 }
-*/
+
 
 /*
  * Score: 5
@@ -588,7 +588,7 @@ TEST(BPlusTreeConcurrentTest, MixTest1) {
  * At the same time, concurrently get the previously inserted keys.
  * Check all the keys get are the same set of keys as previously
  * inserted.
-*/
+
 TEST(BPlusTreeConcurrentTest, MixTest2) {
   TEST_TIMEOUT_BEGIN
   MixTest2Call();
@@ -596,7 +596,7 @@ TEST(BPlusTreeConcurrentTest, MixTest2) {
   remove("test.log");
   TEST_TIMEOUT_FAIL_END(1000 * 600)
 }
-
+*/
 /*
  * Score: 5
  * Description: First insert a set of keys.
