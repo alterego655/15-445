@@ -119,7 +119,7 @@ bool BPLUSTREE_TYPE::InsertIntoLeaf(const KeyType &key, const ValueType &value, 
   }
   leaf_page->Insert(key, value, comparator_);
   if (leaf_page->GetSize() >= leaf_page->GetMaxSize()) {
-    LeafPage *new_leaf = Split(leaf_page, transaction);
+    LeafPage *new_leaf = Split(leaf_page);
     InsertIntoParent(leaf_page, new_leaf->KeyAt(0), new_leaf, transaction);
   }
   BreakFree(true, transaction);
@@ -135,14 +135,12 @@ bool BPLUSTREE_TYPE::InsertIntoLeaf(const KeyType &key, const ValueType &value, 
  */
 INDEX_TEMPLATE_ARGUMENTS
 template <typename N>
-N *BPLUSTREE_TYPE::Split(N *node, Transaction *transaction) {
+N *BPLUSTREE_TYPE::Split(N *node) {
   page_id_t new_page_id;
   Page *new_page = buffer_pool_manager_->NewPage(&new_page_id);
   if (new_page == nullptr) {
     throw Exception(ExceptionType::OUT_OF_MEMORY, "Warning!");
   }
-  new_page->WLatch();
-  transaction->AddIntoPageSet(new_page);
   N *new_node;
   if (node->IsLeafPage()) {
     auto *leaf_node = reinterpret_cast<LeafPage *>(node);
@@ -185,6 +183,7 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node, const KeyType &ke
     new_root_page->PopulateNewRoot(old_node->GetPageId(), key, new_node->GetPageId());
     old_node->SetParentPageId(new_root_id);
     new_node->SetParentPageId(new_root_id);
+    buffer_pool_manager_->UnpinPage(new_node->GetPageId(), true);
     buffer_pool_manager_->UnpinPage(new_root_page->GetPageId(), true);
     return;
   }
@@ -193,8 +192,9 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node, const KeyType &ke
   assert(page != nullptr);
   InternalPage *parent_page = reinterpret_cast<InternalPage *>(page);
   parent_page->InsertNodeAfter(old_node->GetPageId(), key, new_node->GetPageId());
+  buffer_pool_manager_->UnpinPage(new_node->GetPageId(), true);
   if (parent_page->GetSize() > parent_page->GetMaxSize()) {
-    auto *new_parent_page = Split(parent_page, transaction);
+    auto *new_parent_page = Split(parent_page);
     InsertIntoParent(parent_page, new_parent_page->KeyAt(0), new_parent_page, transaction);
   }
   buffer_pool_manager_->UnpinPage(parent_page_id, true);
