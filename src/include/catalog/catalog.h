@@ -77,8 +77,9 @@ class Catalog {
    */
   TableMetadata *CreateTable(Transaction *txn, const std::string &table_name, const Schema &schema) {
     BUSTUB_ASSERT(names_.count(table_name) == 0, "Table names should be unique!");
-    auto table_id = next_table_oid_++;
-    TableHeap
+    /* auto table_id = next_table_oid_++;
+    TableHeapa
+     */
     return nullptr;
   }
 
