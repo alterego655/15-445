@@ -37,10 +37,25 @@ class SeqScanExecutor : public AbstractExecutor {
 
   bool Next(Tuple *tuple, RID *rid) override;
 
-  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); }
+  const Schema *GetOutputSchema() override {
+    return plan_->OutputSchema();
+  }
+  /*
+  std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema) override {
+    std::vector<Value> res;
+    for (auto &col : schema->GetColumns()) {
+      Value val = tuple->GetValue(schema, schema->GetColIdx(col.GetName()));
+      res.push_back(val);
+    }
+    return res;
+  }
+  */
+  std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema);
 
  private:
   /** The sequential scan plan node to be executed. */
-  const SeqScanPlanNode *plan_;
+  const SeqScanPlanNode *plan_{};
+  TableHeap *table = nullptr;
+  TableIterator itr = {nullptr, RID(), nullptr};
 };
 }  // namespace bustub

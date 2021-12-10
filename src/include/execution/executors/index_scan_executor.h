@@ -13,7 +13,7 @@
 #pragma once
 
 #include <vector>
-
+#
 #include "common/rid.h"
 #include "execution/executor_context.h"
 #include "execution/executors/abstract_executor.h"
@@ -35,14 +35,32 @@ class IndexScanExecutor : public AbstractExecutor {
    */
   IndexScanExecutor(ExecutorContext *exec_ctx, const IndexScanPlanNode *plan);
 
-  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); };
+  const Schema *GetOutputSchema() override {
+    return plan_->OutputSchema();
+  };
+
+  /*
+  std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema) override {
+    std::vector<Value> res;
+    for (auto &col : schema->GetColumns()) {
+      Value val = tuple->GetValue(schema, schema->GetColIdx(col.GetName()));
+      res.push_back(val);
+    }
+    return res;
+  }
+  */
 
   void Init() override;
 
   bool Next(Tuple *tuple, RID *rid) override;
 
+  std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema);
+
  private:
   /** The index scan plan node to be executed. */
   const IndexScanPlanNode *plan_;
+  std::unique_ptr<Index> idx = nullptr;
+  std::unique_ptr<TableHeap> table = nullptr;
+  B_PLUS_TREE_INDEX_ITERATOR_TYPE idx_itr{nullptr, 0, nullptr};
 };
 }  // namespace bustub

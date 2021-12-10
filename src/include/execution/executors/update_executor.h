@@ -40,7 +40,9 @@ class UpdateExecutor : public AbstractExecutor {
   UpdateExecutor(ExecutorContext *exec_ctx, const UpdatePlanNode *plan,
                  std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); };
+  const Schema *GetOutputSchema() override {
+    return plan_->OutputSchema();
+  };
 
   void Init() override;
 

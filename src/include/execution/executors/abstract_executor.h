@@ -14,6 +14,8 @@
 
 #include "execution/executor_context.h"
 #include "storage/table/tuple.h"
+#define B_PLUS_TREE_INDEX_ITERATOR_TYPE IndexIterator<GenericKey<8>, RID, GenericComparator<8>>
+#define B_PLUS_TREE_INDEX_TYPE BPlusTreeIndex<GenericKey<8>, RID, GenericComparator<8>>
 
 namespace bustub {
 /**
@@ -46,6 +48,8 @@ class AbstractExecutor {
 
   /** @return the schema of the tuples that this executor produces */
   virtual const Schema *GetOutputSchema() = 0;
+
+  // virtual std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema) = 0;
 
   /** @return the executor context in which this executor runs */
   ExecutorContext *GetExecutorContext() { return exec_ctx_; }

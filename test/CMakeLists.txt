@@ -49,15 +49,15 @@ foreach (bustub_test_source ${BUSTUB_TEST_SOURCES})
 
     # Set test target properties and dependencies.
     set_target_properties(${bustub_test_name}
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
-        COMMAND ${bustub_test_name}
-    )
+            PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test"
+            COMMAND ${bustub_test_name}
+            )
 
     # Add the test under CTest.
     add_test(${bustub_test_name} ${VALGRIND_BIN} ${VALGRIND_OPTIONS}
-    --suppressions=${VALGRIND_SUPPRESSIONS_FILE} ${CMAKE_BINARY_DIR}/test/${bustub_test_name}
-    --gtest_color=yes --gtest_output=xml:${CMAKE_BINARY_DIR}/test/unit_${test_name}.xml)
+            --suppressions=${VALGRIND_SUPPRESSIONS_FILE} ${CMAKE_BINARY_DIR}/test/${bustub_test_name}
+            --gtest_color=yes --gtest_output=xml:${CMAKE_BINARY_DIR}/test/unit_${test_name}.xml)
     add_test(${bustub_test_name} ${CMAKE_BINARY_DIR}/test/${bustub_test_name} --gtest_color=yes
             --gtest_output=xml:${CMAKE_BINARY_DIR}/test/${bustub_test_name}.xml)
 endforeach(bustub_test_source ${BUSTUB_TEST_SOURCES})

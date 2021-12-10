@@ -33,7 +33,9 @@ class LimitExecutor : public AbstractExecutor {
   LimitExecutor(ExecutorContext *exec_ctx, const LimitPlanNode *plan,
                 std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); };
+  const Schema *GetOutputSchema() override {
+    return plan_->OutputSchema();
+  };
 
   void Init() override;
 
