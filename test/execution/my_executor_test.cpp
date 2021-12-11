@@ -244,6 +244,7 @@ TEST_F(ExecutorTest, SimpleSeqScanTest) {
   ASSERT_EQ(result_set.size(), 500);
 }
 */
+/*
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleSeqScanTest2) {
   // SELECT colA, colB FROM test_1 WHERE colA > 600
@@ -269,7 +270,7 @@ TEST_F(ExecutorTest, SimpleSeqScanTest2) {
   }
   ASSERT_EQ(result_set.size(), 399);
 }
-/*
+
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleRawInsertTest) {
   // INSERT INTO empty_table2 VALUES (100, 10), (101, 11), (102, 12)
@@ -314,7 +315,7 @@ TEST_F(ExecutorTest, SimpleRawInsertTest) {
   // Size
   ASSERT_EQ(result_set.size(), 3);
 }
-
+*/
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleIndexScanTest) {
   // SELECT colA, colB FROM test_1 WHERE colA > 500
@@ -348,7 +349,7 @@ TEST_F(ExecutorTest, SimpleIndexScanTest) {
 
   delete key_schema;
 }
-
+/*
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleSelectInsertTest) {
   // INSERT INTO empty_table2 SELECT colA, colB FROM test_1 WHERE colA < 500
