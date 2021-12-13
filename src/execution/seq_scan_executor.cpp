@@ -22,10 +22,10 @@ void SeqScanExecutor::Init() {
   itr = table->Begin(exec_ctx_->GetTransaction());
 }
 
-std::vector<Value> SeqScanExecutor::GetValFromTuple(const Tuple *tuple, const Schema *schema) {
+std::vector<Value> SeqScanExecutor::GetValFromTuple(const Tuple &tuple, const Schema &schema) {
   std::vector<Value> res;
-  for (auto &col : schema->GetColumns()) {
-    Value val = tuple->GetValue(schema, schema->GetColIdx(col.GetName()));
+  for (auto &col : schema.GetColumns()) {
+    Value val = tuple.GetValue(&schema, schema.GetColIdx(col.GetName()));
     res.push_back(val);
   }
   return res;
@@ -49,10 +49,10 @@ bool SeqScanExecutor::Next(Tuple *tuple, RID *rid) {
       return false;
     }
   }
-  std::vector<Value> val = GetValFromTuple(tuple, plan_->OutputSchema());
+  std::vector<Value> val = GetValFromTuple(*tuple, *plan_->OutputSchema());
   *tuple = Tuple(val, plan_->OutputSchema());
-  *rid = tuple->GetRid();
   itr++;
+
   return true;
 }
 }  // namespace bustub

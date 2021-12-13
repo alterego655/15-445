@@ -142,7 +142,7 @@ class ExecutorTest : public ::testing::Test {
   std::vector<std::unique_ptr<Schema>> allocated_output_schemas_;
   static constexpr uint32_t MAX_VARCHAR_SIZE = 128;
 };
-/*
+
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleNestedIndexJoinTest) {
   // 从join后的out table中取出指定的列
@@ -243,8 +243,8 @@ TEST_F(ExecutorTest, SimpleSeqScanTest) {
   }
   ASSERT_EQ(result_set.size(), 500);
 }
-*/
-/*
+
+
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleSeqScanTest2) {
   // SELECT colA, colB FROM test_1 WHERE colA > 600
@@ -315,7 +315,6 @@ TEST_F(ExecutorTest, SimpleRawInsertTest) {
   // Size
   ASSERT_EQ(result_set.size(), 3);
 }
-*/
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleIndexScanTest) {
   // SELECT colA, colB FROM test_1 WHERE colA > 500
@@ -527,7 +526,7 @@ TEST_F(ExecutorTest, SimpleDeleteTest) {
 
   delete key_schema;
 }
-
+*/
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleNestedLoopJoinTest) {
   // SELECT test_1.colA, test_1.colB, test_2.col1, test_2.col3 FROM test_1 JOIN test_2 ON test_1.colA = test_2.col1
@@ -969,5 +968,5 @@ TEST_F(ExecutorTest, IntegratedTest) {
   // Maximum should be TEST2_SIZE - 1
   ASSERT_EQ(maxA_val, TEST2_SIZE - 1);
 }
-*/
+
 }  // namespace bustub

@@ -46,8 +46,9 @@ class ExecutionEngine {
           result_set->push_back(tuple);
         }
       }
-    } catch (Exception &e) {
+    } catch (std::out_of_range &e) {
       // TODO(student): handle exceptions
+      std::cout << e.what() << std::endl;
 
     }
 

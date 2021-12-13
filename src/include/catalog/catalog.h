@@ -166,7 +166,7 @@ class Catalog {
 
   std::vector<IndexInfo *> GetTableIndexes(const std::string &table_name) {
     if (index_names_.count(table_name) == 0) {
-      throw std::out_of_range("GetTableIndexes");
+      throw std::out_of_range("table indexes");
     }
 
     std::vector<IndexInfo *> infos;

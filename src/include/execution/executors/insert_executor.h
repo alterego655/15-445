@@ -40,6 +40,8 @@ class InsertExecutor : public AbstractExecutor {
     return plan_->OutputSchema();
   };
 
+  bool insert(const Tuple& tuple, RID *rid);
+
   void Init() override;
 
   // Note that Insert does not make use of the tuple pointer being passed in.
@@ -49,5 +51,10 @@ class InsertExecutor : public AbstractExecutor {
  private:
   /** The insert plan node to be executed. */
   const InsertPlanNode *plan_;
+  std::unique_ptr<AbstractExecutor> child_exe;
+  // std::unique_ptr<TableHeap> table = nullptr;
+  TableMetadata* table = nullptr;
+  std::vector<IndexInfo *> info = {};
+  std::vector<std::vector<Value>>::const_iterator itr;
 };
 }  // namespace bustub

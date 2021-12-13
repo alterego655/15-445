@@ -77,12 +77,15 @@ class UpdateExecutor : public AbstractExecutor {
     return Tuple(values, &schema);
   }
 
+  void update(const Tuple& tuple, RID *rid);
+
  private:
   /** The update plan node to be executed. */
   const UpdatePlanNode *plan_;
   /** Metadata identifying the table that should be updated. */
-  const TableMetadata *table_info_;
+  const TableMetadata *table_info_ = nullptr;
   /** The child executor to obtain value from. */
   std::unique_ptr<AbstractExecutor> child_executor_;
+  std::vector<IndexInfo *> idxes_info = {};
 };
 }  // namespace bustub

@@ -43,6 +43,8 @@ class DeleteExecutor : public AbstractExecutor {
 
   void Init() override;
 
+  void remove(const Tuple &tuple);
+
   // Note that Delete does not make use of the tuple pointer being passed in.
   // We throw exception if the delete failed for any reason, and return false if all delete succeeded.
   // Delete from indexes if necessary.
@@ -53,5 +55,7 @@ class DeleteExecutor : public AbstractExecutor {
   const DeletePlanNode *plan_;
   /** The child executor to obtain rid from. */
   std::unique_ptr<AbstractExecutor> child_executor_;
+  const TableMetadata *table_info_ = nullptr;
+  std::vector<IndexInfo *> idxes_info = {};
 };
 }  // namespace bustub

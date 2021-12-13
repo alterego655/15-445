@@ -54,7 +54,7 @@ class IndexScanExecutor : public AbstractExecutor {
 
   bool Next(Tuple *tuple, RID *rid) override;
 
-  std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema);
+  std::vector<Value> GetValFromTuple(const Tuple &tuple, const Schema &schema);
 
  private:
   /** The index scan plan node to be executed. */

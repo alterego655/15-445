@@ -50,7 +50,7 @@ class SeqScanExecutor : public AbstractExecutor {
     return res;
   }
   */
-  std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema);
+  std::vector<Value> GetValFromTuple(const Tuple &tuple, const Schema &schema);
 
  private:
   /** The sequential scan plan node to be executed. */
