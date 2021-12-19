@@ -13,8 +13,8 @@
 //#include "index/b_plus_tree.h"
 //#include "vtable/virtual_table.h"
 //
-//namespace cmudb {
-//TEST(BPlusTreeTests, SplitTest) {
+// namespace cmudb {
+// TEST(BPlusTreeTests, SplitTest) {
 //  LOG_DEBUG("current page size is 96 bytes");
 //  // create KeyComparator and index schema
 //  Schema *key_schema = ParseCreateStatement("a bigint");
@@ -60,7 +60,7 @@
 //  remove("test.log");
 //}
 //
-//TEST(BPlusTreeTests, MergeTest) {
+// TEST(BPlusTreeTests, MergeTest) {
 //  LOG_DEBUG("current page size is 96 bytes");
 //  // create KeyComparator and index schema
 //  Schema *key_schema = ParseCreateStatement("a bigint");
@@ -103,7 +103,7 @@
 //  remove("test.log");
 //}
 //
-//TEST(BPlusTreeTests, InsertTest1) {
+// TEST(BPlusTreeTests, InsertTest1) {
 //  // create KeyComparator and index schema
 //  Schema *key_schema = ParseCreateStatement("a bigint");
 //  GenericComparator<8> comparator(key_schema);
@@ -157,7 +157,7 @@
 //  remove("test.log");
 //}
 //
-//TEST(BPlusTreeTests, InsertTest2) {
+// TEST(BPlusTreeTests, InsertTest2) {
 //  // create KeyComparator and index schema
 //  Schema *key_schema = ParseCreateStatement("a bigint");
 //  GenericComparator<8> comparator(key_schema);
@@ -221,7 +221,7 @@
 //  remove("test.log");
 //}
 //
-//TEST(BPlusTreeTests, DeleteTest1) {
+// TEST(BPlusTreeTests, DeleteTest1) {
 //  // create KeyComparator and index schema
 //  std::string createStmt = "a bigint";
 //  Schema *key_schema = ParseCreateStatement(createStmt);
@@ -296,7 +296,7 @@
 //  remove("test.log");
 //}
 //
-//TEST(BPlusTreeTests, DeleteTest2) {
+// TEST(BPlusTreeTests, DeleteTest2) {
 //  // create KeyComparator and index schema
 //  Schema *key_schema = ParseCreateStatement("a bigint");
 //  GenericComparator<8> comparator(key_schema);
@@ -370,7 +370,7 @@
 //  remove("test.log");
 //}
 //
-//TEST(BPlusTreeTests, ScaleTest) {
+// TEST(BPlusTreeTests, ScaleTest) {
 //  // create KeyComparator and index schema
 //  Schema *key_schema = ParseCreateStatement("a bigint");
 //  GenericComparator<8> comparator(key_schema);

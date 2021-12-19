@@ -20,7 +20,7 @@ UpdateExecutor::UpdateExecutor(ExecutorContext *exec_ctx, const UpdatePlanNode *
     : AbstractExecutor(exec_ctx), plan_(plan), child_executor_(std::move(child_executor)) {}
 
 void UpdateExecutor::Init() {
-  Catalog * catalog = exec_ctx_->GetCatalog();
+  Catalog *catalog = exec_ctx_->GetCatalog();
   table_info_ = catalog->GetTable(plan_->TableOid());
   // idxes_info = catalog->GetTableIndexes(table_info_->name_);
   child_executor_->Init();

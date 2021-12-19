@@ -12,8 +12,8 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
-#
 #include "common/rid.h"
 #include "execution/executor_context.h"
 #include "execution/executors/abstract_executor.h"
@@ -35,9 +35,7 @@ class IndexScanExecutor : public AbstractExecutor {
    */
   IndexScanExecutor(ExecutorContext *exec_ctx, const IndexScanPlanNode *plan);
 
-  const Schema *GetOutputSchema() override {
-    return plan_->OutputSchema();
-  };
+  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); };
 
   /*
   std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema) override {
@@ -54,7 +52,7 @@ class IndexScanExecutor : public AbstractExecutor {
 
   bool Next(Tuple *tuple, RID *rid) override;
 
-  std::vector<Value> GetValFromTuple(const Tuple &tuple, const Schema &schema);
+  std::vector<Value> GetValFromTuple(const Tuple &tuple);
 
  private:
   /** The index scan plan node to be executed. */

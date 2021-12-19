@@ -37,9 +37,7 @@ class SeqScanExecutor : public AbstractExecutor {
 
   bool Next(Tuple *tuple, RID *rid) override;
 
-  const Schema *GetOutputSchema() override {
-    return plan_->OutputSchema();
-  }
+  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); }
   /*
   std::vector<Value> GetValFromTuple(const Tuple *tuple, const Schema *schema) override {
     std::vector<Value> res;
@@ -50,12 +48,17 @@ class SeqScanExecutor : public AbstractExecutor {
     return res;
   }
   */
-  std::vector<Value> GetValFromTuple(const Tuple &tuple, const Schema &schema);
+  Tuple GenerateTuple(const Tuple &tuple);
 
  private:
   /** The sequential scan plan node to be executed. */
   const SeqScanPlanNode *plan_{};
   TableHeap *table = nullptr;
   TableIterator itr = {nullptr, RID(), nullptr};
+  /* int count1 = 0;
+  int count2 = 0;
+  int count3 = 0;
+  int count4 = 0;
+   */
 };
 }  // namespace bustub

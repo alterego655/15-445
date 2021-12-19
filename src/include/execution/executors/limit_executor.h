@@ -33,9 +33,7 @@ class LimitExecutor : public AbstractExecutor {
   LimitExecutor(ExecutorContext *exec_ctx, const LimitPlanNode *plan,
                 std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  const Schema *GetOutputSchema() override {
-    return plan_->OutputSchema();
-  };
+  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); };
 
   void Init() override;
 
@@ -46,5 +44,7 @@ class LimitExecutor : public AbstractExecutor {
   const LimitPlanNode *plan_;
   /** The child executor to obtain value from. */
   std::unique_ptr<AbstractExecutor> child_executor_;
+  size_t counter1 = 0;
+  size_t counter2 = 0;
 };
 }  // namespace bustub

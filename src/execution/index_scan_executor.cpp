@@ -15,10 +15,10 @@ namespace bustub {
 IndexScanExecutor::IndexScanExecutor(ExecutorContext *exec_ctx, const IndexScanPlanNode *plan)
     : AbstractExecutor(exec_ctx), plan_(plan) {}
 
-std::vector<Value> IndexScanExecutor::GetValFromTuple(const Tuple &tuple, const Schema &schema) {
+std::vector<Value> IndexScanExecutor::GetValFromTuple(const Tuple &tuple) {
   std::vector<Value> res;
-  for (auto &col : schema.GetColumns()) {
-    Value val = tuple.GetValue(&schema, schema.GetColIdx(col.GetName()));
+  for (auto &col : GetOutputSchema()->GetColumns()) {
+    Value val = tuple.GetValue(GetOutputSchema(), GetOutputSchema()->GetColIdx(col.GetName()));
     res.push_back(val);
   }
   return res;
@@ -53,12 +53,11 @@ bool IndexScanExecutor::Next(Tuple *tuple, RID *rid) {
       return false;
     }
   }
-  std::vector<Value> val = GetValFromTuple(*tuple, *plan_->OutputSchema());
+  std::vector<Value> val = GetValFromTuple(*tuple);
   *tuple = Tuple(val, plan_->OutputSchema());
   *rid = tuple->GetRid();
   ++idx_itr;
   return true;
 }
-
 
 }  // namespace bustub

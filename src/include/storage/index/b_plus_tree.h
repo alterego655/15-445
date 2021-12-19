@@ -77,15 +77,15 @@ class BPlusTree {
   // read data from file and remove one by one
   void RemoveFromFile(const std::string &file_name, Transaction *transaction = nullptr);
   // expose for test purpose
-  Page *FindLeafPage(const KeyType &key, bool leftMost = false, TypeOfOp operation = TypeOfOp::READ , Transaction *transaction = nullptr);
+  Page *FindLeafPage(const KeyType &key, bool leftMost = false, TypeOfOp operation = TypeOfOp::READ ,
+                     Transaction *transaction = nullptr);
 
 
  private:
-  BPlusTreePage *CrabbingFetchPage(page_id_t page_id, page_id_t parent_id, Transaction *transaction, TypeOfOp opt);
+  BPlusTreePage *CrabbingFetchPage(page_id_t page_id, page_id_t parent_id, Transaction *transaction, TypeOfOp operation);
 
   void BreakFree(bool exclusive, Transaction *transaction,  page_id_t parent_id = -1);
 
-  // BPlusTreePage *FetchPage(page_id_t page_id);
   template <typename N>
   bool FindSibling(N *node, N* &sibling, Transaction *transaction);
 
@@ -112,7 +112,8 @@ class BPlusTree {
   bool AdjustRoot(BPlusTreePage *node);
 
   void UpdateRootPageId(int insert_record = 0);
-  inline void Lock(bool exclusive,Page * page) {
+
+  inline void Lock(bool exclusive, Page * page) {
     if (exclusive) {
       page->WLatch();
     } else {
@@ -120,17 +121,18 @@ class BPlusTree {
     }
   }
 
-  inline void Unlock(bool exclusive,Page *page) {
+  inline void Unlock(bool exclusive, Page *page) {
     if (exclusive) {
       page->WUnlatch();
     } else {
       page->RUnlatch();
     }
   }
-  inline void Unlock(bool exclusive,page_id_t pageId) {
+
+  inline void Unlock(bool exclusive, page_id_t pageId) {
     auto page = buffer_pool_manager_->FetchPage(pageId);
-    Unlock(exclusive,page);
-    buffer_pool_manager_->UnpinPage(pageId,exclusive);
+    Unlock(exclusive, page);
+    buffer_pool_manager_->UnpinPage(pageId, exclusive);
   }
 
   inline void LockRootPageId(bool exclusive) {

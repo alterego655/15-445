@@ -20,14 +20,13 @@ DeleteExecutor::DeleteExecutor(ExecutorContext *exec_ctx, const DeletePlanNode *
     : AbstractExecutor(exec_ctx), plan_(plan), child_executor_(std::move(child_executor)) {}
 
 void DeleteExecutor::Init() {
-  Catalog * catalog = exec_ctx_->GetCatalog();
+  Catalog *catalog = exec_ctx_->GetCatalog();
   table_info_ = catalog->GetTable(plan_->TableOid());
   idxes_info = catalog->GetTableIndexes(table_info_->name_);
   child_executor_->Init();
 }
 
 void DeleteExecutor::remove(const Tuple &tuple) {
-
   for (auto &inf : idxes_info) {
     std::vector<RID> rids;
     Tuple &tuple1 = const_cast<Tuple &>(tuple);

@@ -21,19 +21,16 @@ NestIndexJoinExecutor::NestIndexJoinExecutor(ExecutorContext *exec_ctx, const Ne
 void NestIndexJoinExecutor::Init() {
   Catalog *catalog = exec_ctx_->GetCatalog();
   inner_table = catalog->GetTable(plan_->GetInnerTableOid())->table_.get();
-  idx = std::move(catalog->GetIndex(plan_->GetIndexName(),
-                                    catalog->GetTable(plan_->GetInnerTableOid())->name_)->index_);
+  idx =
+      std::move(catalog->GetIndex(plan_->GetIndexName(), catalog->GetTable(plan_->GetInnerTableOid())->name_)->index_);
   b_plus_tree_idx = reinterpret_cast<B_PLUS_TREE_INDEX_TYPE *>(idx.get());
   child_executor_->Init();
-
 }
-
 
 Tuple NestIndexJoinExecutor::Combine(Tuple *tuple1, Tuple *tuple2) {
   std::vector<Value> result;
   for (auto const &col : GetOutputSchema()->GetColumns()) {
-    Value val = col.GetExpr()->EvaluateJoin(tuple1, plan_->OuterTableSchema(),
-                                            tuple2, plan_->InnerTableSchema());
+    Value val = col.GetExpr()->EvaluateJoin(tuple1, plan_->OuterTableSchema(), tuple2, plan_->InnerTableSchema());
     result.emplace_back(val);
   }
   return Tuple{result, GetOutputSchema()};

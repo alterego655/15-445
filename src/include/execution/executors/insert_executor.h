@@ -14,7 +14,7 @@
 
 #include <memory>
 #include <utility>
-
+#include <vector>
 #include "execution/executor_context.h"
 #include "execution/executors/abstract_executor.h"
 #include "execution/plans/insert_plan.h"
@@ -36,11 +36,9 @@ class InsertExecutor : public AbstractExecutor {
   InsertExecutor(ExecutorContext *exec_ctx, const InsertPlanNode *plan,
                  std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  const Schema *GetOutputSchema() override {
-    return plan_->OutputSchema();
-  };
+  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); };
 
-  bool insert(const Tuple& tuple, RID *rid);
+  bool insert(const Tuple &tuple, RID *rid);
 
   void Init() override;
 
@@ -52,8 +50,7 @@ class InsertExecutor : public AbstractExecutor {
   /** The insert plan node to be executed. */
   const InsertPlanNode *plan_;
   std::unique_ptr<AbstractExecutor> child_exe;
-  // std::unique_ptr<TableHeap> table = nullptr;
-  TableMetadata* table = nullptr;
+  TableMetadata *table = nullptr;
   std::vector<IndexInfo *> info = {};
   std::vector<std::vector<Value>>::const_iterator itr;
 };

@@ -40,7 +40,6 @@ class IndexScanPlanNode : public AbstractPlanNode {
   /** @return the identifier of the table that should be scanned */
   index_oid_t GetIndexOid() const { return index_oid_; }
 
-
  private:
   /** The predicate that all returned tuples must satisfy. */
   const AbstractExpression *predicate_;

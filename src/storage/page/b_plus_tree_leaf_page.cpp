@@ -9,12 +9,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <sstream>
-
-#include "common/exception.h"
-#include <common/logger.h>
-#include "common/rid.h"
 #include "storage/page/b_plus_tree_leaf_page.h"
+#include <sstream>
+#include "common/exception.h"
+#include "common/logger.h"
+#include "common/rid.h"
 
 namespace bustub {
 
@@ -85,7 +84,6 @@ int B_PLUS_TREE_LEAF_PAGE_TYPE::FindKey(const KeyType &key, const KeyComparator 
   }
   return -1;
 }
-
 
 /*
  * Helper method to find and return the value associated with input "index"(a.k.a

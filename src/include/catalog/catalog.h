@@ -80,11 +80,12 @@ class Catalog {
     auto table_id = next_table_oid_++;
 
     std::unique_ptr<TableHeap> new_table(new TableHeap(bpm_, lock_manager_, log_manager_, txn));
-    std::unique_ptr<TableMetadata> new_table_meta(new TableMetadata(schema, table_name, std::move(new_table), table_id));
+    std::unique_ptr<TableMetadata> new_table_meta(
+        new TableMetadata(schema, table_name, std::move(new_table), table_id));
     TableMetadata *ptr_to_meta = new_table_meta.get();
 
     names_[table_name] = table_id;
-    tables_[table_id]  = std::move(new_table_meta);
+    tables_[table_id] = std::move(new_table_meta);
 
     return ptr_to_meta;
   }
@@ -128,7 +129,8 @@ class Catalog {
     auto idx_meta = new IndexMetadata(index_name, table_name, &schema, key_attrs);
 
     std::unique_ptr<Index> BPlus_tree_idx(new BPlusTreeIndex<KeyType, ValueType, KeyComparator>(idx_meta, bpm_));
-    std::unique_ptr<IndexInfo> bp_tree_idx_info(new IndexInfo(key_schema, index_name, std::move(BPlus_tree_idx), idx_id, table_name, keysize));
+    std::unique_ptr<IndexInfo> bp_tree_idx_info(
+        new IndexInfo(key_schema, index_name, std::move(BPlus_tree_idx), idx_id, table_name, keysize));
 
     auto bp_idx_info_ptr = bp_tree_idx_info.get();
     indexes_[idx_id] = std::move(bp_tree_idx_info);
@@ -172,7 +174,7 @@ class Catalog {
     std::vector<IndexInfo *> infos;
     auto idxes = index_names_[table_name];
 
-    for (auto& idx_ptr : idxes) {
+    for (auto &idx_ptr : idxes) {
       auto idx_id = idx_ptr.second;
       auto idxInfo = indexes_[idx_id].get();
       infos.push_back(idxInfo);

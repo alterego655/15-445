@@ -244,7 +244,6 @@ TEST_F(ExecutorTest, SimpleSeqScanTest) {
   ASSERT_EQ(result_set.size(), 500);
 }
 
-
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleSeqScanTest2) {
   // SELECT colA, colB FROM test_1 WHERE colA > 600

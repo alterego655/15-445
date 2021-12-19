@@ -49,9 +49,7 @@ class ExecutionEngine {
     } catch (std::out_of_range &e) {
       // TODO(student): handle exceptions
       std::cout << e.what() << std::endl;
-
     }
-
     return true;
   }
 

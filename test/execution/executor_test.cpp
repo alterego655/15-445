@@ -138,7 +138,7 @@ class ExecutorTest : public ::testing::Test {
   std::vector<std::unique_ptr<Schema>> allocated_output_schemas_;
   static constexpr uint32_t MAX_VARCHAR_SIZE = 128;
 };
-
+/*
 // NOLINTNEXTLINE
 TEST_F(ExecutorTest, SimpleSeqScanTest) {
   // SELECT colA, colB FROM test_1 WHERE colA < 500
@@ -434,9 +434,9 @@ TEST_F(ExecutorTest, SimpleNestedLoopJoinTest) {
               << tuple.GetValue(out_final, out_final->GetColIdx("col3")).GetAs<int32_t>() << ", " << std::endl;
   }
 }
-
+*/
 // NOLINTNEXTLINE
-TEST_F(ExecutorTest, DISABLED_SimpleAggregationTest) {
+TEST_F(ExecutorTest, SimpleAggregationTest) {
   // SELECT COUNT(colA), SUM(colA), min(colA), max(colA) from test_1;
   std::unique_ptr<AbstractPlanNode> scan_plan;
   const Schema *scan_schema;
@@ -479,7 +479,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleAggregationTest) {
   ASSERT_EQ(minA_val, 0);
   // Maximum should be TEST1_SIZE - 1
   ASSERT_EQ(maxA_val, TEST1_SIZE - 1);
-  std::cout << countA_val << std::endl;
+  // std::cout << countA_val << std::endl;
   std::cout << sumA_val << std::endl;
   std::cout << minA_val << std::endl;
   std::cout << maxA_val << std::endl;
@@ -487,7 +487,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleAggregationTest) {
 }
 
 // NOLINTNEXTLINE
-TEST_F(ExecutorTest, DISABLED_SimpleGroupByAggregation) {
+TEST_F(ExecutorTest, SimpleGroupByAggregation) {
   // SELECT count(colA), colB, sum(colC) FROM test_1 Group By colB HAVING count(colA) > 100
   std::unique_ptr<AbstractPlanNode> scan_plan;
   const Schema *scan_schema;

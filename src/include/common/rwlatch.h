@@ -86,7 +86,6 @@ class ReaderWriterLatch {
   }
 
  private:
-
   mutex_t mutex_;
   cond_t writer_;
   cond_t reader_;

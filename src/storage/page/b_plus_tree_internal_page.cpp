@@ -9,12 +9,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "storage/page/b_plus_tree_internal_page.h"
 #include <iostream>
 #include <sstream>
-
-#include <common/logger.h>
 #include "common/exception.h"
-#include "storage/page/b_plus_tree_internal_page.h"
+#include "common/logger.h"
 
 namespace bustub {
 /*****************************************************************************
@@ -121,7 +120,6 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::PopulateNewRoot(const ValueType &old_value,
   SetKeyAt(1, new_key);
   SetValueAt(1, new_value);
   SetSize(2);
-
 }
 /*
  * Insert new_key & new_value pair right after the pair with its value ==
@@ -131,7 +129,6 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::PopulateNewRoot(const ValueType &old_value,
 INDEX_TEMPLATE_ARGUMENTS
 int B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertNodeAfter(const ValueType &old_value, const KeyType &new_key,
                                                     const ValueType &new_value) {
-
   int idx = ValueIndex(old_value) + 1;
   assert(idx > 0);
   for (int i = GetSize(); i > idx; --i) {

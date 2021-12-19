@@ -16,7 +16,7 @@ namespace bustub {
  * Score: 5
  * Description: The same test that has been run for checkpoint 1,
  * but added iterator for value checking
-*/
+ */
 TEST(BPlusTreeTests, InsertTest1) {
   // create KeyComparator and index schema
   Schema *key_schema = ParseCreateStatement("a bigint");
@@ -153,7 +153,7 @@ TEST(BPlusTreeTests, InsertTest2) {
  * Description: Insert a set of keys, use GetValue and iterator to
  * check the the inserted keys. Then delete a subset of the keys.
  * Finally use the iterator to check the remained keys.
-*/
+ */
 TEST(BPlusTreeTests, DeleteTest1) {
   // create KeyComparator and index schema
   std::string createStmt = "a bigint";
@@ -232,12 +232,11 @@ TEST(BPlusTreeTests, DeleteTest1) {
   remove("test.log");
 }
 
-
 /*
  * Score: 10
  * Description: Similar to DeleteTest2, except that, during the Remove step,
  * a different subset of keys are removed.
-*/
+ */
 TEST(BPlusTreeTests, DeleteTest2) {
   // create KeyComparator and index schema
   Schema *key_schema = ParseCreateStatement("a bigint");
@@ -316,13 +315,12 @@ TEST(BPlusTreeTests, DeleteTest2) {
   remove("test.log");
 }
 
-
 /*
  * Score: 10
  * Description: Insert 10000 keys. Use GetValue and the iterator to iterate
  * through the inserted keys. Then remove 9900 inserted keys. Finally, use
  * the iterator to check the correctness of the remaining keys.
-*/
+ */
 TEST(BPlusTreeTests, ScaleTest) {
   // create KeyComparator and index schema
   Schema *key_schema = ParseCreateStatement("a bigint");
@@ -372,7 +370,6 @@ TEST(BPlusTreeTests, ScaleTest) {
   }
   EXPECT_EQ(current_key, keys.size() + 1);
 
-
   int64_t remove_scale = 9900;
   std::vector<int64_t> remove_keys;
   for (int64_t key = 1; key < remove_scale; key++) {
@@ -405,7 +402,6 @@ TEST(BPlusTreeTests, ScaleTest) {
   remove("test.log");
 }
 
-
 /*
  * Score: 10
  * Description: Insert a set of keys. Concurrently insert and delete
@@ -413,7 +409,7 @@ TEST(BPlusTreeTests, ScaleTest) {
  * At the same time, concurrently get the previously inserted keys.
  * Check all the keys get are the same set of keys as previously
  * inserted.
-*/
+ */
 TEST(BPlusTreeTests, SequentialMixTest) {
   // create KeyComparator and index schema
   Schema *key_schema = ParseCreateStatement("a bigint");

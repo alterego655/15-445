@@ -28,9 +28,7 @@ bool INDEXITERATOR_TYPE::isEnd() {
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-const MappingType &INDEXITERATOR_TYPE::operator*() {
-  return leaf_page->GetItem(cur_idx);
-}
+const MappingType &INDEXITERATOR_TYPE::operator*() { return leaf_page->GetItem(cur_idx); }
 
 INDEX_TEMPLATE_ARGUMENTS
 INDEXITERATOR_TYPE &INDEXITERATOR_TYPE::operator++() {
@@ -45,7 +43,6 @@ INDEXITERATOR_TYPE &INDEXITERATOR_TYPE::operator++() {
   }
   return *this;
 }
-
 
 template class IndexIterator<GenericKey<4>, RID, GenericComparator<4>>;
 

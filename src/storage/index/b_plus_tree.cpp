@@ -10,9 +10,9 @@
 //===----------------------------------------------------------------------===//
 
 #include <string>
+#include "common/logger.h"
 #include "common/exception.h"
 #include "common/rid.h"
-#include <common/logger.h>
 #include "storage/index/b_plus_tree.h"
 #include "storage/page/header_page.h"
 
@@ -30,6 +30,7 @@ BPLUSTREE_TYPE::BPlusTree(std::string name, BufferPoolManager *buffer_pool_manag
 
 template <typename KeyType, typename ValueType, typename KeyComparator>
 thread_local int BPlusTree<KeyType, ValueType, KeyComparator>::rootLockCount = 0;
+
 /*
  * Helper function to decide whether current b+tree is empty
  */
@@ -253,7 +254,7 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
   InternalPage *parent = reinterpret_cast<InternalPage *>(parent_page);
 
   // N* sibling = reinterpret_cast<N *>(sibling_page);
-  if (sibling->GetSize() + node->GetSize() > node->GetMaxSize()) {
+  if (sibling->GetSize() + node->GetSize() >= node->GetMaxSize()) {
     int node_idx_parent = parent->ValueIndex(node->GetPageId());
     Redistribute(sibling, node, node_idx_parent);
     buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), false);
@@ -275,7 +276,6 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
 INDEX_TEMPLATE_ARGUMENTS
 template <typename N>
 bool BPLUSTREE_TYPE::FindSibling(N *node, N* &sibling, Transaction *transaction) {
-
   Page* parent_page = buffer_pool_manager_->FetchPage(node->GetParentPageId());
   assert(parent_page != nullptr);
   InternalPage *parent = reinterpret_cast<InternalPage *>(parent_page);
@@ -401,7 +401,7 @@ bool BPLUSTREE_TYPE::AdjustRoot(BPlusTreePage *old_root_node) {
     return true;
   }
   if (old_root_node->GetSize() == 0) {
-    assert (old_root_node->GetParentPageId() == INVALID_PAGE_ID);
+    assert(old_root_node->GetParentPageId() == INVALID_PAGE_ID);
     root_page_id_ = INVALID_PAGE_ID;
     UpdateRootPageId(0);
     return true;
@@ -485,7 +485,8 @@ Page *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key, bool leftMost, TypeOfOp o
   auto *node = CrabbingFetchPage(root_page_id_, -1, transaction, operation);
   page_id_t child_page_id;
 
-  for (page_id_t cur = root_page_id_; !node->IsLeafPage(); node = CrabbingFetchPage(child_page_id, cur, transaction, operation), cur = child_page_id) {
+  for (page_id_t cur = root_page_id_; !node->IsLeafPage();
+       node = CrabbingFetchPage(child_page_id, cur, transaction, operation), cur = child_page_id) {
     InternalPage *internal_page = reinterpret_cast<InternalPage *>(node);
     child_page_id = leftMost ? internal_page->ValueAt(0) : internal_page->Lookup(key, comparator_);
   }
@@ -493,7 +494,8 @@ Page *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key, bool leftMost, TypeOfOp o
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-BPlusTreePage *BPLUSTREE_TYPE::CrabbingFetchPage(page_id_t child_page_id, page_id_t parent_id, Transaction *transaction, TypeOfOp operation) {
+BPlusTreePage *BPLUSTREE_TYPE::CrabbingFetchPage
+    (page_id_t child_page_id, page_id_t parent_id, Transaction *transaction, TypeOfOp operation) {
   bool exclusive = operation != TypeOfOp::READ;
   auto page = buffer_pool_manager_->FetchPage(child_page_id);
   Lock(exclusive, page);

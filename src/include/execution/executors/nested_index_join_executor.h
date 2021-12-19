@@ -41,15 +41,14 @@ class NestIndexJoinExecutor : public AbstractExecutor {
   NestIndexJoinExecutor(ExecutorContext *exec_ctx, const NestedIndexJoinPlanNode *plan,
                         std::unique_ptr<AbstractExecutor> &&child_executor);
 
-  const Schema *GetOutputSchema() override {
-    return plan_->OutputSchema();
-  }
+  const Schema *GetOutputSchema() override { return plan_->OutputSchema(); }
 
   void Init() override;
 
   bool Next(Tuple *tuple, RID *rid) override;
 
   Tuple Combine(Tuple *tuple1, Tuple *tuple2);
+
  private:
   /** The nested index join plan node. */
   const NestedIndexJoinPlanNode *plan_;

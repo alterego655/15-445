@@ -187,7 +187,7 @@ TEST(BPlusTreeTests, InsertTest2) {
  * Description: Insert a set of keys range from 1 to 10000 in
  * a random order. Check whether the key-value pair is valid
  * using GetValue
-*/
+ */
 TEST(BPlusTreeTests, ScaleTest) {
   // create KeyComparator and index schema
   Schema *key_schema = ParseCreateStatement("a bigint");

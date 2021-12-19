@@ -16,8 +16,10 @@ namespace bustub {
 NestedLoopJoinExecutor::NestedLoopJoinExecutor(ExecutorContext *exec_ctx, const NestedLoopJoinPlanNode *plan,
                                                std::unique_ptr<AbstractExecutor> &&left_executor,
                                                std::unique_ptr<AbstractExecutor> &&right_executor)
-    : AbstractExecutor(exec_ctx), plan_(plan), left_child_executor_(std::move(left_executor)),
-      right_child_executor_(std::move(right_executor)){}
+    : AbstractExecutor(exec_ctx),
+      plan_(plan),
+      left_child_executor_(std::move(left_executor)),
+      right_child_executor_(std::move(right_executor)) {}
 
 void NestedLoopJoinExecutor::Init() {
   left_child_executor_->Init();
@@ -29,13 +31,12 @@ void NestedLoopJoinExecutor::Init() {
 Tuple NestedLoopJoinExecutor::Combine(Tuple *tuple1, Tuple *tuple2) {
   std::vector<Value> res;
   for (auto const &col : GetOutputSchema()->GetColumns()) {
-    Value val = col.GetExpr()->EvaluateJoin(tuple1, left_child_executor_->GetOutputSchema(),
-                                            tuple2, right_child_executor_->GetOutputSchema());
+    Value val = col.GetExpr()->EvaluateJoin(tuple1, left_child_executor_->GetOutputSchema(), tuple2,
+                                            right_child_executor_->GetOutputSchema());
     res.emplace_back(val);
   }
   return Tuple{res, GetOutputSchema()};
 }
-
 
 bool NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) {
   const Schema *left_schema = left_child_executor_->GetOutputSchema();
@@ -57,8 +58,6 @@ bool NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) {
       return true;
     }
   }
-
-
 }
 
 }  // namespace bustub

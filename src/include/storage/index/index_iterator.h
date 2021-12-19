@@ -33,14 +33,9 @@ class IndexIterator {
 
   IndexIterator &operator++();
 
-  bool operator==(const IndexIterator &itr) const {
-    return leaf_page == itr.leaf_page &&
-           cur_idx == itr.cur_idx;
-  }
+  bool operator==(const IndexIterator &itr) const { return leaf_page == itr.leaf_page && cur_idx == itr.cur_idx; }
 
-  bool operator!=(const IndexIterator &itr) const {
-    return !(*this == itr);
-  }
+  bool operator!=(const IndexIterator &itr) const { return !(*this == itr); }
 
  private:
   // add your own private member variables here
