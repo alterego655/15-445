@@ -77,12 +77,13 @@ class BPlusTree {
   // read data from file and remove one by one
   void RemoveFromFile(const std::string &file_name, Transaction *transaction = nullptr);
   // expose for test purpose
-  Page *FindLeafPage(const KeyType &key, bool leftMost = false, TypeOfOp operation = TypeOfOp::READ ,
-                     Transaction *transaction = nullptr);
+  Page *FindLeafPage(const KeyType &key, bool leftMost = false,
+                     TypeOfOp operation = TypeOfOp::READ, Transaction *transaction = nullptr);
 
 
  private:
-  BPlusTreePage *CrabbingFetchPage(page_id_t page_id, page_id_t parent_id, Transaction *transaction, TypeOfOp operation);
+  BPlusTreePage *CrabbingFetchPage(page_id_t page_id, page_id_t parent_id,
+                                   Transaction *transaction, TypeOfOp operation);
 
   void BreakFree(bool exclusive, Transaction *transaction,  page_id_t parent_id = -1);
 

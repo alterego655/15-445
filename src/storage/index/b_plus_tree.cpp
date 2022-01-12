@@ -246,14 +246,13 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
     }
     return removeOldNode;
   }
-  N* sibling;
-  bool pre = FindSibling(node, sibling, transaction);
-
   Page* parent_page = buffer_pool_manager_->FetchPage(node->GetParentPageId());
 
   InternalPage *parent = reinterpret_cast<InternalPage *>(parent_page);
 
-  // N* sibling = reinterpret_cast<N *>(sibling_page);
+  N *sibling;
+  bool pre = FindSibling(node, sibling, transaction);
+
   if (sibling->GetSize() + node->GetSize() >= node->GetMaxSize()) {
     int node_idx_parent = parent->ValueIndex(node->GetPageId());
     Redistribute(sibling, node, node_idx_parent);
@@ -272,10 +271,9 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
   return true;
 }
 
-
 INDEX_TEMPLATE_ARGUMENTS
 template <typename N>
-bool BPLUSTREE_TYPE::FindSibling(N *node, N* &sibling, Transaction *transaction) {
+bool BPLUSTREE_TYPE::FindSibling(N* node, N* &sibling, Transaction *transaction) {
   Page* parent_page = buffer_pool_manager_->FetchPage(node->GetParentPageId());
   assert(parent_page != nullptr);
   InternalPage *parent = reinterpret_cast<InternalPage *>(parent_page);

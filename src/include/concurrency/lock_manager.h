@@ -18,9 +18,11 @@
 #include <memory>
 #include <mutex>  // NOLINT
 #include <unordered_map>
+#include <map>
+#include <stack>
 #include <utility>
 #include <vector>
-
+#include <set>
 #include "common/rid.h"
 #include "concurrency/transaction.h"
 
@@ -48,6 +50,7 @@ class LockManager {
     std::list<LockRequest> request_queue_;
     std::condition_variable cv_;  // for notifying blocked transactions on this rid
     bool upgrading_ = false;
+    std::mutex lock_;
   };
 
  public:
@@ -107,6 +110,23 @@ class LockManager {
    */
   bool Unlock(Transaction *txn, const RID &rid);
 
+  // bool CheckBeforeLock(Transaction *txn);
+
+  std::list<LockRequest>::iterator GetIterator
+      (std::list<LockRequest> *request_queue_, txn_id_t txnId);
+
+  std::unordered_map<txn_id_t, std::vector<RID>>::iterator GetIterator
+      (std::unordered_map<txn_id_t, std::vector<RID>> *txn_to_rid_, txn_id_t txn_id);
+
+  std::vector<RID>::iterator GetIterator(std::vector<RID> *rids, RID rid);
+
+  void RemoveRid(std::unordered_map<txn_id_t, std::vector<RID>> *txn_to_rid_, txn_id_t txnId, RID rid);
+
+  void AbortHandling(std::list<LockRequest> *request_queue_, txn_id_t txnId, RID rid);
+
+  bool CanGrant(const LockRequestQueue &lockRequestQueue);
+
+  bool CheckBeforeLocking(Transaction *txn, LockMode lockMode);
   /*** Graph API ***/
   /**
    * Adds edge t1->t2
@@ -118,6 +138,7 @@ class LockManager {
   /** Removes an edge from t1 -> t2. */
   void RemoveEdge(txn_id_t t1, txn_id_t t2);
 
+  void RemoveNode(txn_id_t txnId);
   /**
    * Checks if the graph has a cycle, returning the newest transaction ID in the cycle if so.
    * @param[out] txn_id if the graph has a cycle, will contain the newest transaction ID
@@ -125,6 +146,9 @@ class LockManager {
    */
   bool HasCycle(txn_id_t *txn_id);
 
+  bool dfs(int v, std::map<txn_id_t, bool> *marked, std::map<txn_id_t, bool> *recStack);
+
+  // bool dfs(std::map<txn_id_t, std::set<txn_id_t>> *waits_for, std::vector<int> *flags, int i);
   /** @return the set of all edges in the graph, used for testing only! */
   std::vector<std::pair<txn_id_t, txn_id_t>> GetEdgeList();
 
@@ -135,11 +159,17 @@ class LockManager {
   std::mutex latch_;
   std::atomic<bool> enable_cycle_detection_;
   std::thread *cycle_detection_thread_;
-
   /** Lock table for lock requests. */
   std::unordered_map<RID, LockRequestQueue> lock_table_;
   /** Waits-for graph representation. */
-  std::unordered_map<txn_id_t, std::vector<txn_id_t>> waits_for_;
+  // std::unordered_map<txn_id_t, std::vector<txn_id_t>> waits_for;
+  std::map<txn_id_t, std::set<txn_id_t>> waits_for_;
+  // std::stack<int> stk;
+  // std::set<txn_id_t> elements;
+  std::set<txn_id_t> txns;
+  std::set<txn_id_t> granted;
+  std::set<txn_id_t> waiting;
+  std::unordered_map<txn_id_t, std::vector<RID>> txn_to_rid_;
 };
 
 }  // namespace bustub

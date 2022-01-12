@@ -139,7 +139,7 @@ class TransactionAbortException : public std::exception {
         return "Transaction " + std::to_string(txn_id_) + " aborted on lockshared on READ_UNCOMMITTED\n";
     }
     // Todo: Should fail with unreachable.
-    return "";
+    return "Transaction " + std::to_string(txn_id_) + " aborted on unreachable";
   }
 };
 
@@ -256,6 +256,8 @@ class Transaction {
   /** The ID of this transaction. */
   txn_id_t txn_id_;
 
+  // std::shared_ptr<std::vector<RID>> txn_to_rid_;
+
   /** The undo set of table tuples. */
   std::shared_ptr<std::deque<TableWriteRecord>> table_write_set_;
   /** The undo set of indexes. */
@@ -267,7 +269,6 @@ class Transaction {
   std::shared_ptr<std::deque<Page *>> page_set_;
   /** Concurrent index: the page IDs that were deleted during index operation.*/
   std::shared_ptr<std::unordered_set<page_id_t>> deleted_page_set_;
-
   /** LockManager: the set of shared-locked tuples held by this transaction. */
   std::shared_ptr<std::unordered_set<RID>> shared_lock_set_;
   /** LockManager: the set of exclusive-locked tuples held by this transaction. */

@@ -646,6 +646,7 @@ TEST_F(ExecutorTest, SimpleUpdateTest) {
     auto const600 = MakeConstantValueExpression(ValueFactory::GetIntegerValue(50));
     auto predicate = MakeComparisonExpression(colA, const600, ComparisonType::LessThan);
     out_schema1 = MakeOutputSchema({{"colA", colA}, {"colA", colA}});
+
     scan_plan1 = std::make_unique<SeqScanPlanNode>(out_schema1, predicate, table_info->oid_);
   }
   std::unique_ptr<AbstractPlanNode> insert_plan;
