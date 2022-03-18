@@ -132,11 +132,11 @@ int B_PLUS_TREE_LEAF_PAGE_TYPE::Insert(const KeyType &key, const ValueType &valu
   }
   int idx = KeyIndex(key, comparator);
   assert(idx >= 0);
-  for (int i = GetSize(); i > idx; i--) {
+  IncreaseSize(1);
+  for (int i = GetSize() - 1; i > idx; i--) {
     array[i] = array[i - 1];
   }
   array[idx] = MappingType{key, value};
-  IncreaseSize(1);
   return GetSize();
 }
 

@@ -196,7 +196,7 @@ void BPLUSTREE_TYPE::InsertIntoParent(BPlusTreePage *old_node, const KeyType &ke
   buffer_pool_manager_->UnpinPage(new_node->GetPageId(), true);
   if (parent_page->GetSize() > parent_page->GetMaxSize()) {
     auto *new_parent_page = Split(parent_page);
-    InsertIntoParent(parent_page, new_parent_page->KeyAt(0), new_parent_page, transaction);
+    InsertIntoParent(parent_page, new_parent_page->KeyAt(0), new_parent_page, transaction);buffer_pool_manager_->UnpinPage(new_parent_page->GetPageId(), true);
     buffer_pool_manager_->UnpinPage(new_parent_page->GetPageId(), true);
   }
   buffer_pool_manager_->UnpinPage(parent_page_id, true);
@@ -259,6 +259,7 @@ bool BPLUSTREE_TYPE::CoalesceOrRedistribute(N *node, Transaction *transaction) {
     buffer_pool_manager_->UnpinPage(parent_page->GetPageId(), false);
     return false;
   }
+
   if (!pre) {
     int removed_idx = parent->ValueIndex(sibling->GetPageId());
     Coalesce(&node, &sibling, &parent, removed_idx, transaction);

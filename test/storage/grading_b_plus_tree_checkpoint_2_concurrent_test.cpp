@@ -604,11 +604,13 @@ TEST(BPlusTreeConcurrentTest, MixTest2) {
  * deleted and new keys are added correctly.
  */
 TEST(BPlusTreeConcurrentTest, MixTest3) {
-  TEST_TIMEOUT_BEGIN
-  MixTest3Call();
-  remove("test.db");
-  remove("test.log");
-  TEST_TIMEOUT_FAIL_END(1000 * 600)
+  for (int i = 0; i < 10; i++) {
+    TEST_TIMEOUT_BEGIN
+    MixTest3Call();
+    remove("test.db");
+    remove("test.log");
+    TEST_TIMEOUT_FAIL_END(1000 * 600)
+  }
 }
 
 }  // namespace bustub
